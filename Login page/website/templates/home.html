@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1 align="center">Notes</h1>
+<h3>User Name: {{ user.first_name }}</h3>
+<ul class="list-group list-group-flush" id="notes">
+    {% for note in user.notes %}
+    <li class="list-group-item">{{ note.data }}
+        <button type="button" class="close" onclick="deleteNote({{ note.id }})">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+<form method="POST">
+    <textarea class="form-control" id="note" name="note"></textarea>
+    <br/>
+    <div align="center">
+        <button class="btn btn-primary" type="submit">Add Notes</button>
+    </div>
+</form>
+
+<script>
+function deleteNote(noteId) {
+    console.log('deleteNote function called with noteId:', noteId);
+    fetch('/delete-note', {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ noteId: noteId })
+    }).then((_res) => {
+        if (_res.ok) {
+            window.location.href = '/';
+        } else {
+            return _res.json().then((data) => {
+                console.error('Error:', data.error);
+                alert('Failed to delete note: ' + data.error);
+            });
+        }
+    }).catch((error) => {
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}
